@@ -24,17 +24,18 @@ def checkProxyUseful(proxy_obj):
     :return: Proxy object, status
     """
 
-    if validUsefulProxy(proxy_obj.proxy):
+    result, total_seconds = validUsefulProxy(proxy_obj.proxy, proxy_obj.type)
+    proxy_obj.check_count += 1
+    proxy_obj.resp_seconds = total_seconds
+    proxy_obj.last_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if result:
         # 检测通过 更新proxy属性
-        proxy_obj.check_count += 1
         proxy_obj.last_status = 1
-        proxy_obj.last_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if proxy_obj.fail_count > 0:
             proxy_obj.fail_count -= 1
-        return proxy_obj, True
+        status = True
     else:
-        proxy_obj.check_count += 1
         proxy_obj.last_status = 0
-        proxy_obj.last_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         proxy_obj.fail_count += 1
-        return proxy_obj, False
+        status = False
+    return proxy_obj, status

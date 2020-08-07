@@ -14,12 +14,14 @@ __author__ = 'JHao'
 
 import sys
 from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 sys.path.append('../')
 
-from Schedule import doRawProxyCheck, doUsefulProxyCheck
+from Schedule import doRawProxyCheck, doUsefulProxyCheck, doTrashProxyCheck
 from Manager import ProxyManager
 from Util import LogHandler
+import time
 
 
 class DoFetchProxy(ProxyManager):
@@ -44,17 +46,29 @@ def usefulProxyScheduler():
     doUsefulProxyCheck()
 
 
+def trashProxyScheduler():
+    doTrashProxyCheck()
+
 def runScheduler():
     rawProxyScheduler()
     usefulProxyScheduler()
+    trashProxyScheduler()
 
     scheduler_log = LogHandler("scheduler_log")
-    scheduler = BlockingScheduler(logger=scheduler_log)
+    scheduler = BackgroundScheduler(logger=scheduler_log)
 
     scheduler.add_job(rawProxyScheduler, 'interval', minutes=5, id="raw_proxy_check", name="raw_proxy定时采集")
     scheduler.add_job(usefulProxyScheduler, 'interval', minutes=1, id="useful_proxy_check", name="useful_proxy定时检查")
+    scheduler.add_job(trashProxyScheduler, 'interval', minutes=2, id="trash_proxy_check", name="trash_proxy定时回收检查")
 
     scheduler.start()
+    try:
+        while True:
+            time.sleep(30)
+            print('scheduler sleep a moment!')
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
+        print('scheduler shutdown.')
 
 
 if __name__ == '__main__':

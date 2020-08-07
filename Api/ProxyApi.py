@@ -39,11 +39,12 @@ class JsonResponse(Response):
 app.response_class = JsonResponse
 
 api_list = {
-    'get': u'get an useful proxy',
+    'get': u'get an useful proxy , options params:check_count,resp_seconds,type',
     # 'refresh': u'refresh proxy pool',
     'get_all': u'get all proxy from proxy pool',
     'delete?proxy=127.0.0.1:8080': u'delete an unable proxy',
-    'get_status': u'proxy number'
+    'get_status': u'proxy number',
+    'get_trash': u'get all trash proxy from proxy pool'
 }
 
 
@@ -54,7 +55,21 @@ def index():
 
 @app.route('/get/')
 def get():
-    proxy = ProxyManager().get()
+    cnt = request.args.get('check_count')              # 代理验证成功次数 check_count
+    if cnt is None:
+        cnt = request.args.get('cnt')                  # 代理验证成功次数 check_count
+    proxy_type = request.args.get('type')              # 代理类型: http/https/socks4/socks5/socks
+    resp_time = request.args.get('resp_seconds')       # 应答时间 : 单位秒数
+    if resp_time is None:
+        resp_time = request.args.get('time')           # 应答时间 : 单位秒数
+
+    count = 1 if cnt is None or int(cnt) < 1 else int(cnt)
+    if proxy_type is None or proxy_type.upper() not in ["HTTP", "HTTPS", "SOCKS", "SOCKS5", "SOCKS4"]:
+        proxy_type = "HTTP"
+
+    resp_seconds = 10 if resp_time is None or int(resp_time) < 1 else int(resp_time)
+
+    proxy = ProxyManager().get(check_count=count, proxy_type=proxy_type, resp_seconds=resp_seconds)
     return proxy.info_json if proxy else {"code": 0, "src": "no proxy"}
 
 
@@ -69,6 +84,12 @@ def refresh():
 @app.route('/get_all/')
 def getAll():
     proxies = ProxyManager().getAll()
+    return [_.info_dict for _ in proxies]
+
+
+@app.route('/get_trash/')
+def getTrash():
+    proxies = ProxyManager().getTrash()
     return [_.info_dict for _ in proxies]
 
 
@@ -88,7 +109,6 @@ def getStatus():
 if platform.system() != "Windows":
     import gunicorn.app.base
     from gunicorn.six import iteritems
-
 
     class StandaloneApplication(gunicorn.app.base.BaseApplication):
 

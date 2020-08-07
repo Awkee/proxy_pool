@@ -17,7 +17,7 @@ import os
 
 import logging
 
-from logging.handlers import TimedRotatingFileHandler
+from logging.handlers import RotatingFileHandler
 
 # 日志级别
 CRITICAL = 50
@@ -59,8 +59,9 @@ class LogHandler(logging.Logger):
         """
         file_name = os.path.join(LOG_PATH, '{name}.log'.format(name=self.name))
         # 设置日志回滚, 保存在log目录, 一天保存一个文件, 保留15天
-        file_handler = TimedRotatingFileHandler(filename=file_name, when='D', interval=1, backupCount=15)
-        file_handler.suffix = '%Y%m%d.log'
+        # file_handler = TimedRotatingFileHandler(filename=file_name, when='D', interval=1, backupCount=15)
+        # file_handler.suffix = '%Y%m%d.log'
+        file_handler = RotatingFileHandler(filename=file_name, maxBytes=100*1024*1024, backupCount=15)
         if not level:
             file_handler.setLevel(self.level)
         else:

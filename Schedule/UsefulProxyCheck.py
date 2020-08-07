@@ -23,8 +23,6 @@ from Util import LogHandler
 from Manager import ProxyManager
 from ProxyHelper import checkProxyUseful, Proxy
 
-FAIL_COUNT = 0
-
 
 class UsefulProxyCheck(ProxyManager, Thread):
     def __init__(self, queue, thread_name):
@@ -46,16 +44,15 @@ class UsefulProxyCheck(ProxyManager, Thread):
 
             proxy_obj = Proxy.newProxyFromJson(proxy_str)
             proxy_obj, status = checkProxyUseful(proxy_obj)
-            if status or proxy_obj.fail_count < FAIL_COUNT:
+            if status:
                 self.db.put(proxy_obj)
                 self.log.info('UsefulProxyCheck - {}  : {} validation pass'.format(self.name,
                                                                                    proxy_obj.proxy.ljust(20)))
             else:
                 self.log.info('UsefulProxyCheck - {}  : {} validation fail'.format(self.name,
                                                                                    proxy_obj.proxy.ljust(20)))
-                self.db.delete(proxy_obj.proxy)
+                self.delete(proxy_obj) # move to trash
             self.queue.task_done()
-
 
 def doUsefulProxyCheck():
     proxy_queue = Queue()
@@ -66,7 +63,7 @@ def doUsefulProxyCheck():
         proxy_queue.put(_proxy)
 
     thread_list = list()
-    for index in range(10):
+    for index in range(30):
         thread_list.append(UsefulProxyCheck(proxy_queue, "thread_%s" % index))
 
     for thread in thread_list:

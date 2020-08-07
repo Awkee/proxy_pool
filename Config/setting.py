@@ -35,7 +35,7 @@ PY3 = sys.version_info >= (3,)
 
 DB_TYPE = getenv('db_type', 'SSDB').upper()
 DB_HOST = getenv('db_host', '127.0.0.1')
-DB_PORT = getenv('db_port', 8888)
+DB_PORT = getenv('db_port', 8989)
 DB_PASSWORD = getenv('db_password', '')
 
 
@@ -45,7 +45,7 @@ DATABASES = {
         "TYPE": DB_TYPE,
         "HOST": DB_HOST,
         "PORT": DB_PORT,
-        "NAME": "proxy",
+        "NAME": "pr0",
         "PASSWORD": DB_PASSWORD
     }
 }
@@ -53,21 +53,24 @@ DATABASES = {
 # register the proxy getter function
 
 PROXY_GETTER = [
-    "freeProxy01",
-    "freeProxy02",
-    "freeProxy03",
+    "free01_data5u",
+    "free02_66ip",
     "freeProxy04",
     "freeProxy05",
-    "freeProxy06",
     "freeProxy07",
-    "freeProxy08",
-    "freeProxy09",
+    "freeProxy10",
+    "freeProxy11",
+    "freeProxy12",
+    "freeProxy13",
+    "freeProxy14",
+    "freeProxy15",
+    "freeProxySunny9577",
 ]
 
 """ API config http://127.0.0.1:5010 """
 SERVER_API = {
     "HOST": "0.0.0.0",  # The ip specified which starting the web API
-    "PORT": 5010  # port number to which the server listens to
+    "PORT": 5030  # port number to which the server listens to
 }
 
 
