@@ -114,6 +114,7 @@ docker run --env db_type=REDIS --env db_host=127.0.0.1 --env db_port=6379 --env 
 | ----| ---- | ---- | ----|
 | / | GET | api介绍 | None |
 | /get | GET | 随机获取一个代理 | None|
+| /get?check_count=100 | GET | 随机获取一个检测次数大于等于100次的代理,过滤条件可以是resp_seconds,check_count,type | None|
 | /get_all | GET | 获取所有代理 |None|
 | /get_status | GET | 查看代理数量 |None|
 | /delete | GET | 删除代理  |proxy=host:ip|
